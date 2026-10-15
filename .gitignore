@@ -1,0 +1,58 @@
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments and packaging
+.venv/
+venv/
+env/
+build/
+dist/
+*.egg-info/
+
+# Raw experimental data and generated reconstruction outputs
+# Keep small text examples (including examples/DT_Be_ROI.txt) versioned.
+/Data/
+/data/
+/results/
+/psf_results/
+/tomography_results/
+*.nxs
+*.h5
+*.hdf5
+*.hdf
+*.npy
+*.npz
+*.vtk
+*.vtp
+*.vti
+*.stl
+*.ply
+
+# Machine-specific configuration and secrets
+.env
+.env.*
+!.env.example
+config.local.json
+config.*.local.json
+*.pem
+*.key
+
+# Editors, notebooks, OS files and temporary outputs
+.vscode/
+.idea/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+*.tmp
+*.temp
+*.bak
+*~
