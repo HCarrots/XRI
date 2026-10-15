@@ -1,0 +1,66 @@
+{
+  "input": {
+    "calibration_nxs": "../Data/15341_grid_scan_20261013220247_1.nxs",
+    "sample_nxs": "../Data/15469_grid_scan_20261014231918_1.nxs",
+    "roi_table": "examples/DT_Be_ROI.txt"
+  },
+  "acquisition": {
+    "calibration_exposure_s": 0.5,
+    "sample_exposure_s": 0.5,
+    "monitor": "D_SiC_Current1",
+    "detector": "D_LAMBDA",
+    "foil_thickness_mm": 0.05,
+    "detector_pixel_pitch_mm": 0.055
+  },
+  "roi": {
+    "excluded_ids": [
+      "31",
+      "44"
+    ],
+    "label_overrides": {
+      "35": "VU-A3"
+    }
+  },
+  "grid": {
+    "x_step_mm": null
+  },
+  "psf": {
+    "min_peak_fraction": 0.3,
+    "min_r_squared": 0.8,
+    "edge_margin_pixels": 1.2,
+    "min_observations": 3,
+    "max_trajectory_rms_pixels": 0.75,
+    "sigma_bounds_pixels": [
+      0.3,
+      12.0
+    ],
+    "max_fit_evaluations": 4000
+  },
+  "reconstruction": {
+    "fit_gains": true,
+    "anchor_roi": "36_VU-C1",
+    "gain_bounds": [
+      0.05,
+      20.0
+    ],
+    "max_gain_iterations": 500,
+    "gain_tolerance": 1e-05,
+    "nnls_max_iterations": 20000,
+    "nnls_tolerance": 1e-07
+  },
+  "tv": {
+    "enabled": true,
+    "lambda": null,
+    "relative_fraction": 0.005,
+    "max_iterations": 40000,
+    "tolerance": 1e-06
+  },
+  "runtime": {
+    "chunk_frames": 16,
+    "output_dir": "results/15469"
+  },
+  "output": {
+    "save_diagnostics": true,
+    "plots": true
+  }
+}
