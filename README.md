@@ -4,7 +4,62 @@
 
 **保留 TV 正则化。** 不包含重建后的空间裁剪、强度阈值分割、对称性清理、底座去除、插值加密、网格平滑或曲面导出。ROI 提取和标定质量检查属于测量处理；TV 属于反演目标函数。它们的参数与几何后处理分开说明。
 
-## 运行
+## Linux / 服务器一键运行
+
+首次部署时安装 Python 3.10 或以上版本，在 `XRI` 目录中创建环境并安装依赖（只需执行一次）：
+
+```bash
+cd /path/to/XRI
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+编辑本目录的 `config.json`，将 `input.calibration_nxs` 和 `input.sample_nxs` 的占位路径替换为服务器上两个原始 HDF5 文件的**绝对路径**，例如：
+
+```json
+"input": {
+  "calibration_nxs": "/data/experiment/foil.hdf5",
+  "sample_nxs": "/data/experiment/sample.h5",
+  "roi_table": "examples/DT_Be_ROI.txt"
+}
+```
+
+这是配置中的 `input` 片段，保留文件中其他配置项。程序按 HDF5 内容读取，扩展名可以为 `.nxs`、`.h5` 或 `.hdf5`；内部必须符合下文及《输入输出参数》中约定的原始 NeXus 结构，不能使用任意 HDF5 或重建结果文件替代。
+
+默认配置沿用当前 15469 实验参数和随项目提供的 ROI 表。更换实验时须核对曝光时间、探测器、监测通道、薄膜厚度、ROI 表、排除/标签设置、增益锚点和反演参数。
+
+填写配置后，在 `XRI` 目录运行：
+
+```bash
+# 完整流程：校验 → 标定 → 积分 → PSF → NNLS/TV → 保存结果
+bash run.sh
+
+# 仅检查输入，不生成结果
+bash run.sh --validate-only
+
+# 使用另一份配置（相对路径以当前命令的工作目录为基准）
+bash run.sh --config /absolute/path/config.other.json
+```
+
+脚本会定位自身目录，可以从任意工作目录执行 `bash /path/to/XRI/run.sh`。脚本默认读取它旁边的 `config.json`；配置**内容中的**相对路径始终以该配置文件所在目录为基准，含空格的命令参数须加引号。
+
+解释器选择顺序为 `PYTHON_BIN` → `XRI/.venv/bin/python` → PATH 中的 `python3` → `python`。使用 Conda 或其他环境时，可以显式指定解释器：
+
+```bash
+PYTHON_BIN="/path/to/environment/bin/python" bash run.sh
+```
+
+脚本不自动安装依赖，默认前台运行，实时输出进度，并传递 Python 的退出状态。断开 SSH 后继续运行可使用：
+
+```bash
+nohup bash run.sh > xri-console.log 2>&1 < /dev/null &
+```
+
+默认结果保存在 `XRI/results/default_run/`，主要文件为 `reconstruction.h5`、`summary.json`、`diagnostics.png` 和 `run.log`。检查 `summary.json` 中的收敛状态；主结果也可能是 TV 未收敛时采用的 NNLS 基线。
+
+**输出目录必须不存在。** 再次运行前，将 `config.json` 中的 `runtime.output_dir` 改为新的目录，例如 `results/run_002`。程序不会覆盖、删除旧结果，也不支持断点续算；失败时保留已生成的文件和日志。
+
+## 原有 Python 命令行入口
 
 在当前项目根目录的 PowerShell 中：
 
@@ -19,7 +74,7 @@
 .venv\Scripts\python.exe -m unittest discover -s XRI/tests -v
 ```
 
-移到另一台机器时，安装 Python 3.10 或以上版本，在该目录执行 `python -m pip install -r requirements.txt`，修改 JSON 内三个输入路径和输出目录，然后执行：
+原有配置 `config.15469.json` 和命令行接口继续可用。也可在 `XRI` 目录直接执行：
 
 ```powershell
 python run_xri.py --config config.15469.json
@@ -57,7 +112,7 @@ python run_xri.py --config config.15469.json
        → 固定增益的非负 TV 反演 → I(X,Y,Z) + 轴 + 残差 + 可观测性诊断
 ```
 
-默认输出在 `XRI/results/15469/`：
+默认配置 `config.json` 输出在 `XRI/results/default_run/`；原有 `config.15469.json` 输出在 `XRI/results/15469/`：
 
 - `reconstruction.h5`：主结果。TV 收敛时采用 TV；未收敛时采用 NNLS 并明确记录。
 - `reconstruction_nnls.h5`：非负最小二乘基线。

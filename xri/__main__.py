@@ -7,7 +7,7 @@ from .pipeline import run, validate_inputs
 
 
 def main():
-    parser = argparse.ArgumentParser(description="XRI: foil calibration + elastic-integrated joint 3D reconstruction")
+    parser = argparse.ArgumentParser(description="XRI: foil calibration and elastic-integrated joint 3D reconstruction")
     parser.add_argument("--config", required=True, help="JSON config; relative paths resolve from this file")
     parser.add_argument("--validate-only", action="store_true", help="Inspect input metadata/ROIs without creating results")
     args = parser.parse_args()
